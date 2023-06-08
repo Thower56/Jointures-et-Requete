@@ -58,3 +58,11 @@ insert into etudiant_cours(etudiantId, courId, dateDebut, dateFin, noteFinale) V
 (3,1,'2022-01-03','2022-06-06',75),
 (4,1,'2022-01-03','2022-06-06',45),
 (5,1,'2022-01-03',null,null);
+
+select titre from cours where titre like '%c%';
+
+select e.prenom + ' ' + e.nom as Etudiant from etudiant as e
+inner join etudiant_cours as ec
+on ec.etudiantId = e.etudiantId
+where ec.dateFin is null
+group by e.etudiantId;
