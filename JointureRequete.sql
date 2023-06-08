@@ -61,8 +61,72 @@ insert into etudiant_cours(etudiantId, courId, dateDebut, dateFin, noteFinale) V
 
 select titre from cours where titre like '%c%';
 
-select e.prenom + ' ' + e.nom as Etudiant from etudiant as e
-inner join etudiant_cours as ec
+select CONCAT_WS(' ', prenom, nom) as Etudiant, count(ec.courId) as CourSuivi from etudiant as e
+left join etudiant_cours as ec
 on ec.etudiantId = e.etudiantId
 where ec.dateFin is null
-group by e.etudiantId;
+group by CONCAT_WS(' ', prenom, nom)
+HAVING count(ec.courId) > 2;
+
+select CONCAT_WS(' ', prenom, nom) as Etudiant, count(ec.courId) as CourReussi from etudiant as e
+left join etudiant_cours as ec
+on ec.etudiantId = e.etudiantId
+where ec.noteFinale > 60
+GROUP BY CONCAT_WS(' ', prenom, nom);
+
+
+select c.titre as Cours, count(ec.etudiantId) NombreEtudiant from cours as c
+left join etudiant_cours as ec
+on c.courId = ec.courId
+where ec.dateDebut = '2022-08-29'
+GROUP BY c.titre
+having count(ec.etudiantId) > 0;
+
+
+/*Question 2*/
+
+Use summit;
+
+select CONCAT_WS(' ', first_name, last_name) as Employe, salary from s_emp as e
+where salary > (select AVG(salary) from s_emp);
+
+select last_name as Nom from s_emp as e
+left join s_dept as s
+on s.id = e.dept_id
+where s.id = (select dept_id from s_emp where last_name = 'Smith') and last_name != 'Smith';
+
+select name as NomClient, o.id as NumeroCommande, DATEDIFF(DAY,date_ordered, date_shipped) as DelaiCommande from s_customer as c
+left join s_ord as o
+on o.customer_id = c.id
+where DATEDIFF(DAY,date_ordered, date_shipped) > (select AVG(DATEDIFF(DAY,date_ordered, date_shipped)) from s_ord)
+ORDER BY DelaiCommande desc;
+
+Select name from s_dept as s, s_emp as e
+where (select COUNT(*) from s_emp as e where e.dept_id = s.id) = 2
+GROUP BY name;
+
+select d.name as Departement, count(e.id) as NombreEmploye from s_dept as d
+join s_emp as e
+on e.dept_id = d.id
+GROUP BY d.name;
+/* ?? pas sur 13 resultat alors quil y a 12 departement*/
+
+select total 
+from s_ord as o
+left join s_emp as e
+on e.id = o.sales_rep_id
+where e.id = 12 and total < any(select total from s_ord as o2 where o2.sales_rep_id = 14 )
+ORDER BY total ASC;
+
+
+select top 1 last_name from s_emp ORDER BY start_date desc;
+
+select DISTINCT last_name as Nom, salary, dept_id as NumeroDepartement from s_emp, s_dept as d
+where salary > (select avg(salary) from s_emp as e2 where e2.dept_id = d.id and salary > 1350);
+
+select AVG(price) from s_item , s_product, s_inventory, s_warehouse as w
+where w.id = 101;
+
+select c.name, c.credit_rating from s_customer as c
+where c.credit_rating like '%exce%';
+
