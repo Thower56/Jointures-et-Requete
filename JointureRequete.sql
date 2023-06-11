@@ -108,8 +108,8 @@ GROUP BY name;
 select d.name as Departement, count(e.id) as NombreEmploye from s_dept as d
 join s_emp as e
 on e.dept_id = d.id
-GROUP BY d.name;
-/* ?? pas sur 13 resultat alors quil y a 12 departement*/
+GROUP BY d.name, d.id;
+
 
 select total 
 from s_ord as o
@@ -130,3 +130,12 @@ where w.id = 101;
 select c.name, c.credit_rating from s_customer as c
 where c.credit_rating like '%exce%';
 
+select c.id as client, cast(ROUND(AVG(i.quantity),2) as decimal(10,2)) from s_customer as c, s_emp as e, s_ord as o, s_item as i
+where c.sales_rep_id = (select id from s_emp where last_name = 'Giljum' and first_name = 'Henry')
+group by c.id;
+
+select CONCAT_WS(' ', e1.first_name, e1.last_name) as Superieur, COALESCE(sum(e2.id), 0) as NombreEmployer
+from s_emp as e1
+left join s_emp as e2
+on e1.id = e2.manager_id
+group by CONCAT_WS(' ', e1.first_name, e1.last_name);
